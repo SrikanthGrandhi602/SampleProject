@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">SampleProject</string>
+    <string name="service_icon_desc">Service Icon</string>
+</resources>
