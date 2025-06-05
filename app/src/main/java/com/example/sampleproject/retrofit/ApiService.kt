@@ -6,5 +6,5 @@ import retrofit2.http.GET
 
 interface ApiService {
     @GET("servicesNames")
-    suspend fun getServices(): Response<ServiceResponse>
+    suspend fun getServices(): ServiceResponse
 }

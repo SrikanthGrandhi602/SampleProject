@@ -2,17 +2,24 @@ package com.example.sampleproject
 
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.collectAsState
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.sampleproject.adapter.ServiceAdapter
 import com.example.sampleproject.databinding.ActivityMainBinding
+import com.example.sampleproject.model.viewmodel.ServiceViewModel
 import com.example.sampleproject.retrofit.RetrofitClient
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collectLatest
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val serviceAdapter = ServiceAdapter()
+    private val viewmodel : ServiceViewModel by viewModels<ServiceViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,30 +27,19 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Setup RecyclerView with a grid layout (2 columns)
-        binding.recyclerView.layoutManager = GridLayoutManager(this, 2)
-        binding.recyclerView.adapter = serviceAdapter
-
         fetchData()
     }
 
     private fun fetchData() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val response = RetrofitClient.apiService.getServices()
-                // Log response for debugging
-                println("Response code: ${response.code()}, body: ${response.body()}")
-                if (response.isSuccessful) {
-                    val body = response.body()
-                    if (body != null && body.status == "Success") {
-                        val services = body.data
-                        withContext(Dispatchers.Main) {
-                            serviceAdapter.submitList(services)
-                        }
-                    } else {
-                        showError("Invalid status: ${body?.status}")
+                viewmodel.getService()
+                viewmodel._stateValue.collectLatest {
+                    withContext(Dispatchers.Main) {
+                        binding.recyclerView.layoutManager = GridLayoutManager(this@MainActivity, 2)
+                        binding.recyclerView.adapter = serviceAdapter
+                        serviceAdapter.submitList(it.data)
                     }
-                } else {
-                    showError("HTTP Error: ${response.code()} - ${response.message()}")
                 }
             } catch (e: Exception) {
                 showError("Exception: ${e.localizedMessage}")
@@ -57,4 +53,5 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
+
 

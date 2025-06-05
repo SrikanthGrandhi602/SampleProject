@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("dagger.hilt.android.plugin")
     id("kotlin-kapt")
 }
 
@@ -65,7 +66,10 @@ dependencies {
     // Retrofit
     implementation (libs.retrofit)
     implementation (libs.converter.gson)
-
+    //Dependency injection
+    implementation(libs.bundles.android.hilt.dragger)
+    kapt(libs.google.dagger.hilt.android.compiler)
+    kapt ("androidx.hilt:hilt-compiler:1.0.0")
     // Glide
     implementation (libs.glide)
     kapt("com.github.bumptech.glide:compiler:4.16.0")
