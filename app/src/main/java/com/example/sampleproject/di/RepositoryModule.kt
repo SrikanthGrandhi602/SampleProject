@@ -16,4 +16,5 @@ abstract class RepositoryModule {
     @Singleton
     abstract fun provideRepo(fetchServiceImpl: FetchServiceImpl) : FetchService
 
+
 }
